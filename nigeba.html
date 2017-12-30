@@ -19,6 +19,7 @@
             height: 100vh;
             overflow: hidden;
         }
+
     </style>
 
 
@@ -68,7 +69,7 @@
                     initThree(json, json2);
                     initObject();
                     initCamera();
-                    initFromJson(json,json2);
+                    initFromJson(json, json2);
                     loop();
                 })
             });
@@ -100,7 +101,7 @@
 
 
 
-        function initFromJson(json,json2) {
+        function initFromJson(json, json2) {
 
             //            function initThree(json) {
 
@@ -124,6 +125,7 @@
         function initThree() {
 
             canvasFrame = document.getElementById('canvas-frame');
+
 
 
             renderer = new THREE.WebGLRenderer({
@@ -177,10 +179,10 @@
             scene.add(new THREE.AmbientLight(0x505050));
 
             scene.add(makeRoomBox(0, 0, 0));
-            scene.add(makeScreen(0,0,-2800));
+            scene.add(makeScreen(0, 0, -2800));
             var dirLight = makeLight(0, 230, 500);
             scene.add(dirLight);
-            
+
 
 
 
@@ -260,13 +262,13 @@
 
         //座面
 
-        
+
         var loader = new THREE.TextureLoader();
         var mapTextureRed = loader.load('img/red.png');
 
         var makeSeatBoxGeo = new THREE.BoxBufferGeometry(30, 5, 40);
         var makeSeatBoxMtl = new THREE.MeshPhongMaterial({
-            color:0xffffff,
+            color: 0xffffff,
             map: mapTextureRed,
             specularMap: 0xcccccc
         });
@@ -282,10 +284,10 @@
 
         var makeBackBoxGeo = new THREE.BoxBufferGeometry(30, 40, 5);
         var makeBackBoxMtl = new THREE.MeshPhongMaterial({
-            color:0xffffff,
-            map:mapTextureRed,
-            specularMap:0xcccccc
-            
+            color: 0xffffff,
+            map: mapTextureRed,
+            specularMap: 0xcccccc
+
         });
 
         function makeBackBox(x, y, z) {
@@ -317,36 +319,36 @@
         //スクリーンを作る
         function makeScreenSeat(radiusTop, radiusBottom, height, radiusSegments, heightSegments, openEnded, thetaStart, thetaLength) {
             var geometry = new THREE.CylinderGeometry(radiusTop, radiusBottom, height, radiusSegments, heightSegments, openEnded, thetaStart, thetaLength);
-            
-            
-            
+
+
+
             var material = new THREE.MeshBasicMaterial({
                 color: 0xffffff,
                 map: textureVideo,
-                specularMar:0xcccccc
+                specularMar: 0xcccccc
             });
-            
-            var screen = new THREE.Mesh(geometry,material);
+
+            var screen = new THREE.Mesh(geometry, material);
             screen.scale.x = -1;
-            
+
             return screen;
         }
-        
-        
-        function makeScreen(x,y,z){
+
+
+        function makeScreen(x, y, z) {
             var screenGroup = new THREE.Group();
             var standardLength = 0.4;
             var radius = 3200;
             var screenHeight = radius / 16 * 9 * standardLength;
             var thetaStart = -standardLength / 2;
-            
-            
-            screenGroup.add(makeScreenSeat(radius,radius,screenHeight,64,64,true,thetaStart,standardLength));
-            screenGroup.position.set(x,y,z);
+
+
+            screenGroup.add(makeScreenSeat(radius, radius, screenHeight, 64, 64, true, thetaStart, standardLength));
+            screenGroup.position.set(x, y, z);
             return screenGroup;
         }
-        
-        
+
+
         //ダンケルク
 
         var video = document.createElement('video');
@@ -362,25 +364,22 @@
 
         textureVideo.format = THREE.RGBFormat;
 
-        
-        
+
+
         //スクリーンからのディレクショナルライト
-        
-        
-        function makeLight(x,y,z){
-            var light = new THREE.DirectionalLight(0xc96c1c,10);
-        light.position.set(x,y,z);
+
+
+        function makeLight(x, y, z) {
+            var light = new THREE.DirectionalLight(0xc96c1c, 10);
+            light.position.set(x, y, z);
             return light;
         }
-        
-        function makeLightHelper(light){
-            var helper = new THREE.DirectionalLightHelper(light,5);
+
+        function makeLightHelper(light) {
+            var helper = new THREE.DirectionalLightHelper(light, 5);
             return helper;
         }
-        
-        
-        
-        
+
     </script>
 </head>
 

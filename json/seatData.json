@@ -1,5 +1,6 @@
 
 [
+    
     {"name":"A1","type":"normal","x":-3.5,"y":0,"z":0},
     {"name":"A2","type":"normal","x":-2.5,"y":0,"z":0},
     {"name":"A3","type":"normal","x":-1.5,"y":0,"z":0},
@@ -9,8 +10,7 @@
     {"name":"A7","type":"normal","x":2.5,"y":0,"z":0},
     {"name":"A8","type":"normal","x":3.5,"y":0,"z":0},
     
-    
-    
+
     {"name":"B1","type":"premiere","x":-3.5,"y":1,"z":-1},
     {"name":"B2","type":"premiere","x":-2.5,"y":1,"z":-1},
     {"name":"B3","type":"premiere","x":-1.5,"y":1,"z":-1},
