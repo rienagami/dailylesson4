@@ -22,6 +22,8 @@
     </style>
 
     <script>
+        
+        
 //        var picking = new THREE.Projector();
 //        var mouse = {x:0,y:0};
 //        var targetList = [];
@@ -92,6 +94,9 @@
         //seatDataTest.jsonを読み込む
 
         window.addEventListener("load", function() {
+            threeStart();
+        });
+        function threeStart(){
             $.getJSON("json/seatData.json", function(json) {
                 $.getJSON("json/backData.json", function(json2) {
                     initThree(json, json2);
@@ -101,8 +106,7 @@
                     loop();
                 })
             });
-        });
-
+ }
 
 
         var renderer,
@@ -156,7 +160,7 @@
             scene = new THREE.Scene();
             scene.add(new THREE.AmbientLight(0x505050));
             scene.add(makeRoomBox(0, 0, 0));
-            scene.add(makeScreen(0, 0, -5.5));
+            scene.add(makeScreen(0, 0, -3.5));
             var dirLight = makeLight(0, 230, 500);
             scene.add(dirLight);
         }
@@ -181,7 +185,7 @@
             trackball.zoomSpeed = 2.0;
 
             trackball.noPan = false;
-            trackball.panSpeed = 2, 0;
+            trackball.panSpeed = 1, 0;
             trackball.target = new THREE.Vector3(0, 300, 0);
 
             trackball.staticMoving = true;
@@ -191,7 +195,7 @@
         var axis;
 
         function initObject() {
-            axis = new THREE.AxisHelper(20);
+            axis = new THREE.AxisHelper(17);
             scene.add(axis);
             axis.position.set(0, 0, 0);
         }
@@ -202,9 +206,11 @@
             trackball.update();
             step++;
             renderer.render(scene, camera);
-            //            makePicture();
+//            makePicture();
             requestAnimationFrame(loop);
         }
+        
+        //
 
         //座面
         var loader = new THREE.TextureLoader();
@@ -243,17 +249,22 @@
 
         //劇場の箱
 
+        var wall = new THREE.TextureLoader();
+        var mapTextureWall = loader.load('img/wall.png');
+        
         var makeRoomBoxGeo = new THREE.BoxBufferGeometry(12.5, 7.5, 15);
         var makeRoomBoxMtl = new THREE.MeshNormalMaterial({
             side: 1,
             color: 0xffffff,
-            //            map: mapTextureWall,
+            map: mapTextureWall,
             specularMap: 0xcccccc
 
         });
 
         function makeRoomBox(x, y, z) {
             var room = new THREE.Mesh(makeRoomBoxGeo, makeRoomBoxMtl);
+            var roomAxis = new THREE.AxisHelper(17);
+            room.add(roomAxis);
             room.position.set(x, y, z);
             return room;
         }
@@ -284,7 +295,7 @@
 
         function makeScreen(x, y, z) {
             var screenGroup = new THREE.Group();
-            var standardLength = 0.4;
+            var standardLength = 0.8;
             var radius = 10;
             var screenHeight = radius / 16 * 9 * standardLength;
             var thetaStart = -standardLength / 2;

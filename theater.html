@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>JSONとThree.js！</title>
+    <script src="js/three.js_r75/build/three.js"></script>
+    <script src="js/three.js_r75/examples/js/controls/TrackballControls.js"></script>
+    <script src="js/jquery-2.1.3.min.js"></script>
+
+    <style>
+        * {
+            padding: 0px;
+            margin: 0px
+        }
+
+        div#canvas-frame {
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+        }
+    </style>
+
+
+    <script>
+        ////オブジェクトを選択したい！！！何故できない！？
+        function onMouse(e) {
+
+            var rect = e.target.getBoundingClientRect();
+
+            //スクリーン上のマウス位置を取得する
+            var mouseX = e.clientX - rect.left;
+            var mouseY = e.clientY - rect.top;
+
+            //取得したスクリーン座標を-1〜1に正規化する（WebGLは-1〜1で座標が表現される)
+            mouseX = (mouseX / window.innerWidth) * 2 - 1;
+            mouseY = -(mouseY / window.innerHeight) * 2 + 1;
+
+            //マウスの位置ベクトル
+            var pos = new THREE.Vector3(mouseX, mouseY, 0.5);
+
+            //posはスクリーン座標系なのでオブジェクトの座標系に変換
+            //オブジェクト座標系は今表示しているカメラからの視点なので第二引数にカメラオブジェクトを渡す。
+            //new THREE.Project.unprojectVector(pos,camera);↓最新版では下のような書き方になるらしい）
+
+            pos.unproject(camera);
+            //始点、向きベクトルを渡してレイを作成
+
+            var ray = new THREE.Raycaster(camera.position, pos.sub(camera.position).normalize());
+
+            //交差判定
+            //引数は取得対象となるMeshの配列を渡す。
+            var objs = ray.intersectObjects(scene.children);
+
+            if (objs.length > 0) {
+                //交差していたらobjsが1以上になるので、やりたいことをやる。
+                objs[0].object.position.x = 10;
+                console.log(objs[0].object)
+                
+            }
+        }
+
+//seatDataTest.jsonを読み込む
+        
+        window.addEventListener("load", function() {
+            $.getJSON("json/seatDataTest.json", "backData.json",function(json) {
+                initThree(json);
+                initObject();
+                initCamera();
+                loop();
+            });
+        });
+        
+        
+//        
+//         window.addEventListener("load", function() {
+//            $.getJSON("backData.json",function(json) {
+//                initThree(json);
+//                initObject();
+//                initCamera();
+//                loop();
+//            });
+//        });
+
+
+        var renderer,
+            scene,
+            canvasFrame,
+            light;
+
+        function initThree(json) {
+            canvasFrame = document.getElementById('canvas-frame');
+
+
+            renderer = new THREE.WebGLRenderer({
+                antialias: true
+            });
+
+            $(canvasFrame).on('click', function(e) {
+                var rect = e.target.getBoundingClientRect();
+                
+                var mouseX = e.clientX - rect.left;
+                var mouseY = e.clientY - rect.top;
+                
+                mouseX = (mouseX / window.innerWidth) *2 - 1;
+                mouseY = -(mouseY / window.innerHeight)*
+                    2+1;
+
+                
+                var pos = new THREE.Vector3(mouseX,mouseY,0.5);
+                
+                pos.unproject(camera);
+                
+                var ray = new THREE.Raycaster(camera.position,pos.sub(camera.position).normalize());
+                
+                var objs = ray.intersectObjects(scene.children);
+
+                if(objs.length > 0){
+                    objs[0].object.position.x = 50;
+                }
+                
+                
+                
+                
+
+            });
+
+            //            console.log(renderer);
+
+
+
+            if (!renderer) alert('Three.jsの初期化に失敗しました。');
+
+            renderer.setSize(canvasFrame.clientWidth, canvasFrame.clientHeight);
+
+            canvasFrame.appendChild(renderer.domElement);
+
+            renderer.setClearColor(0xb1b1b1, 1.0);
+
+
+
+
+
+            scene = new THREE.Scene();
+
+            for (var i = 0; i < 6; i += 1) {
+                var seatData = json[i];
+                scene.add(makeSeatBox(seatData.x, seatData.y, seatData.z));
+                
+            }
+
+            scene.add(new THREE.AmbientLight(0x505050));
+            
+            
+            
+            for (var i= 0; i <6; i+=1){
+                var backData = json[i];
+                scene.add(makeBackBox(backData.x, backData.y, backData.z));
+            }
+
+
+
+
+
+        }
+
+
+
+
+        var camera;
+
+        function initCamera() {
+            camera = new THREE.PerspectiveCamera(45, canvasFrame.clientWidth / canvasFrame.clientHeight, 1, 10000);
+
+            //カメラの位置
+            camera.position.set(1000, 400, 500);
+
+            trackball = new THREE.TrackballControls(camera, canvasFrame);
+            trackball.screen.width = canvasFrame.clientWidth;
+
+            trackball.screen.height = canvasFrame.clientHeight;
+
+            trackball.screen.offsetLeft = canvasFrame.getBoundingClientRect().left;
+            trackball.screen.offsetTop = canvasFrame.getBoundingClientRect().top;
+
+            trackball.noZoom = false;
+            trackball.zoomSpeed = 4.0;
+
+            trackball.noPan = false;
+            trackball.panSpeed = 1, 0;
+            trackball.target = new THREE.Vector3(0, 300, 0);
+
+            trackball.staticMoving = true;
+            trackball.dynamicDampingFactor = 0.3;
+        }
+
+        var axis;
+
+        function initObject() {
+            axis = new THREE.AxisHelper(1000);
+            scene.add(axis);
+            axis.position.set(0, 0, 0);
+        }
+
+
+
+
+        //無限ループ関数の定義
+        var step = 0;
+
+        function loop() {
+            trackball.update();
+            step++;
+            renderer.render(scene, camera);
+            //            makePicture();
+            requestAnimationFrame(loop);
+        }
+
+
+
+        //画像作成用
+        ////        var makePictureFlag = false;
+        //        
+        //        window.addEventListener('keydown',function(e){
+        //            var keychar = String.fromCharCode(e.keyCode).toLowerCase();
+        //            
+        ////            if(keychar == "s"){
+        ////                makePictureFrag = true;
+        ////            }
+        //        })
+
+
+
+//座面
+
+
+        var makeSeatBoxGeo = new THREE.BoxBufferGeometry(30, 5, 40);
+        var makeSeatBoxMtl = new THREE.MeshNormalMaterial();
+
+        function makeSeatBox(x, y, z) {
+            var seat = new THREE.Mesh(makeSeatBoxGeo, makeSeatBoxMtl);
+            seat.position.set(x, y, z);
+            return seat;
+        }
+ 
+        
+//背面
+        
+        var makeBackBoxGeo = new THREE.BoxBufferGeometry(30,40,5);
+        var makeBackBoxMtl = new THREE.MeshNormalMaterial();
+        
+        function makeBackBox(x,y,z){
+            var back = new THREE.Mesh(makeBackBoxGeo,makeBackBoxMtl);
+            back.position.set(x,y,z);
+            return back;
+        }
+        
+        
+        
+    </script>
+</head>
+
+<body>
+
+    <div id="canvas-frame"></div>
+
+
+
+
+</body>
+</html>

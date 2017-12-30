@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>椅子を作る！</title>
+    <script src="js/three.js_r75/build/three.js"></script>
+    <script src="js/three.js_r75/examples/js/controls/TrackballControls.js"></script>
+    <style>
+        /*  ↓↓↓↓↓↓↓↓↓これを消したら表示全部消えた  ↓↓↓↓↓↓↓↓↓*/
+
+        * {
+            padding: 0px;
+            margin: 0px
+        }
+
+        div#canvas-frame {
+            width: 1200px;
+            height: 700px;
+            overflow: hidden;
+        }
+    </style>
+
+    <script>
+        //windowイベントの定義
+        window.addEventListener("load", function() {
+            threeStart(); //Three.jsのスタート関数の実行
+        });
+
+
+        //Three.jsスタート関数の定義
+        //Three.jsスタートの宣言
+        function threeStart() {
+            initThree();
+            initObject();
+            initCamera();
+            loop();
+            //            initLight();
+        }
+
+        //Three.js初期化関数の定義
+        var renderer,
+            scene,
+            canvasFrame,
+            light;
+
+
+        function initThree() {
+            //キャンバスフレームDOM要素の取得
+            canvasFrame = document.getElementById('canvas-frame');
+            //レンダラーオブジェクトの生成
+            renderer = new THREE.WebGLRenderer({
+                antialias: true
+            });
+
+
+            if (!renderer) alert('Three.jsの初期化に失敗しました。');
+
+            renderer.setSize(canvasFrame.clientWidth, canvasFrame.clientHeight);
+            //キャンバスフレームDOM要素にcanvas要素を追加
+            canvasFrame.appendChild(renderer.domElement);
+
+            //レンダラークリアカラーの設定
+            renderer.setClearColor(0xb1b1b1, 1.0);
+
+            //シーンオブジェクトの生成
+            scene = new THREE.Scene();
+            for (var i = 0; i < 17; i += 1) {
+
+                //前のブロックセンター
+                scene.add(makeChair(-196 + 24.5 * i, 0, 0));
+                scene.add(makeChair(-196 + 24.5 * i, 15, -40));
+                scene.add(makeChair(-196 + 24.5 * i, 30, -80));
+                scene.add(makeChair(-196 + 24.5 * i, 45, -120));
+                scene.add(makeChair(-196 + 24.5 * i, 60, -160));
+
+                scene.add(makeChair(-196 + 24.5 * i, 120, -320));
+                scene.add(makeChair(-196 + 24.5 * i, 135, -360));
+                scene.add(makeChair(-196 + 24.5 * i, 150, -400));
+                scene.add(makeChair(-196 + 24.5 * i, 165, -440));
+                scene.add(makeChair(-196 + 24.5 * i, 180, -480));
+
+                //                scene.add(makeChair(-320 + 40 * 6, -15, 40));
+            }
+
+            //バリアフリースペース
+            for (var c = 0; c < 3; c += 1) {
+                scene.add(makeAccessibleChair(-34 + 35 * c, -15, 40));
+            }
+
+            //左右のブロック
+            for (var d = 0; d < 4; d += 1) {
+                scene.add(makeChair(-350 + 24.5 * d, -15, 40));
+                scene.add(makeChair(275 + 24.5 * d, -15, 40));
+            }
+
+
+
+
+            for (var f = 0; f < 6; f += 1) {
+                //最前列センターシート
+                scene.add(makeChair(-196 + 24.5 * f, -15, 40));
+                scene.add(makeChair(75 + 24.5 * f, -15, 40));
+
+                //後ろのブロックエグゼクティブシート
+                scene.add(makeExChair(275 + 35 * f, 90, -235));
+                scene.add(makeExChair(275 + 35 * f, 105, -280));
+                scene.add(makeExChair(-275 + -35 * f, 90, -235));
+                scene.add(makeExChair(-275 + -35 * f, 105, -280));
+
+                //前のブロック（一部）               
+                scene.add(makeChair(-275 + -24.5 * f, 0, 0));
+                scene.add(makeChair(275 + 24.5 * f, 0, 0));
+
+            }
+
+            //スクリーンと座席の肩の丸みをシーンに追加
+            //**************************************************************************************************
+            scene.add(makeScreen(0, 200, -2500));
+            scene.add(makeRoomBox(0, 200, 0));
+            var dirLight = makeLight(0, 230, 500);
+            scene.add(dirLight);
+            scene.add(makeLightHelper(dirLight));
+            scene.add(ceilingMain(0, 649, 0));
+            scene.add(makeCeilingLight(0,648,0));
+
+
+
+            //for文で繰り返し処理
+            for (var h = 0; h < 8; h += 1) {
+                scene.add(makeChair(-275 + -24.5 * h, 30, -80));
+                scene.add(makeChair(275 + 24.5 * h, 30, -80));
+
+            }
+
+
+            for (var g = 0; g < 7; g += 1) {
+                scene.add(makeChair(-275 + -24.5 * g, 15, -40));
+                scene.add(makeChair(275 + 24.5 * g, 15, -40));
+
+            }
+
+
+
+
+            for (var n = 0; n < 9; n += 1) {
+
+
+                //後ろのブロック（左右）
+                scene.add(makeChair(275 + 24.5 * n, 120, -320));
+                scene.add(makeChair(275 + 24.5 * n, 135, -360));
+                scene.add(makeChair(275 + 24.5 * n, 150, -400));
+                scene.add(makeChair(275 + 24.5 * n, 165, -440));
+                scene.add(makeChair(275 + 24.5 * n, 180, -480));
+
+
+                scene.add(makeChair(-275 + -24.5 * n, 120, -320));
+                scene.add(makeChair(-275 + -24.5 * n, 135, -360));
+                scene.add(makeChair(-275 + -24.5 * n, 150, -400));
+                scene.add(makeChair(-275 + -24.5 * n, 165, -440));
+                scene.add(makeChair(-275 + -24.5 * n, 180, -480));
+
+                //前ブロック左右（一部パーツ）
+                scene.add(makeChair(-275 + -24.5 * n, 45, -120));
+                scene.add(makeChair(-275 + -24.5 * n, 60, -160));
+                scene.add(makeChair(275 + 24.5 * n, 45, -120));
+                scene.add(makeChair(275 + 24.5 * n, 60, -160));
+
+
+            }
+
+            //エグゼクティブシート左右
+            for (var k = 0; k < 11; k += 1) {
+                scene.add(makeExChair(-180 + 35 * k, 90, -235));
+                scene.add(makeExChair(-180 + 35 * k, 105, -280));
+            }
+
+
+
+        }
+
+        //カメラ初期化関数の定義
+        var camera;
+
+        function initCamera() {
+            camera = new THREE.PerspectiveCamera(45, canvasFrame.clientWidth / canvasFrame.clientHeight, 1, 10000);
+
+            //カメラの位置の設定
+            camera.position.set(0, 400, -800);
+            //            camera.position.set(60, 30, 100);
+            //カメラの上ベクトルの設定
+            camera.lookAt({
+                x: 0,
+                y: 0,
+                z: 0
+
+            });
+
+            trackball = new THREE.TrackballControls(camera, canvasFrame);
+
+            //トラックボール動作範囲のサイズとオフセットの設定
+
+            //横幅
+            trackball.screen.width = canvasFrame.clientWidth;
+
+            //縦幅
+            trackball.screen.height = canvasFrame.clientHeight;
+
+            trackball.screen.offsetLeft = canvasFrame.getBoundingClientRect().left;
+            trackball.screen.offsetTop = canvasFrame.getBoundingClientRect().top;
+
+            //トラックボールの回転無効化と回転速度の決定
+            trackball.noZoom = false;
+            trackball.zoomSpeed = 4.0;
+
+            //トラックボールのカメラ中心移動の無効化と中心速度の設定
+            trackball.noPan = false;
+            trackball.panSpeed = 1.0;
+            trackball.target = new THREE.Vector3(0, 0, 0);
+
+            //トラックボールのスタティックムーブの有効化
+            trackball.staticMoving = true;
+            //トラックボールのダイナミックムーブ時の減衰定数
+            trackball.dynamicDampingFactor = 0.3;
+        }
+
+
+
+        //オブジェクト初期化関数の定義
+        //ヘルパー
+        var axis; //軸オブジェクト
+
+        function initObject() {
+            axis = new THREE.AxisHelper(100);
+            scene.add(axis);
+            //            axis.position.set(0, 0, 0);
+        }
+
+
+
+        //無限ループ関数の定義
+        var step = 0; //ステップ数
+        function loop() {
+            trackball.update();
+            step++;
+            renderer.render(scene, camera);
+            makePicture();
+            requestAnimationFrame(loop);
+        }
+
+
+
+
+        //画像作成用
+        var makePictureFlag = false;
+
+        //画像作成イベント
+        window.addEventListener('keydown', function(e) {
+
+            var keychar = String.fromCharCode(e.keyCode).toLowerCase();
+
+            //            var keyChar = String.fromCharCode(e.keyCode).toLowerCase();
+
+            if (keychar == "s") {
+                makePictureFrag = true;
+            }
+
+        });
+
+        //画像作成関数
+        function makePicture() {
+            if (!makePictureFlag) return;
+            var canvas = renderer.domElement;
+
+            var a = document.createElement("a");
+            a.href = canvas.toDataURL("image/png");
+            a.download = "picture";
+            a.innerHTML = "ダウンロード";
+
+            document.getElementsByName("body")[0].appendChild(a);
+
+            makePictureFlag = false;
+        }
+
+        //メイン座席用のテクスチャ
+        var loader = new THREE.TextureLoader();
+        var mapTextureGray = loader.load('img/gray.png');
+
+
+
+        var makeSeatGeo = new THREE.BoxBufferGeometry(20, 5, 23);
+        var makeSeatMtl = new THREE.MeshPhongMaterial({
+            color: 0xffffff,
+            map: mapTextureGray,
+            specularMap: 0xcccccc
+        });
+
+
+        function makeSeat() {
+            var seat = new THREE.Mesh(makeSeatGeo, makeSeatMtl);
+            return seat;
+        }
+
+
+
+
+        var makeBackGeo = new THREE.BoxBufferGeometry(10, 5, 5);
+        var makeBackMtl = new THREE.MeshPhongMaterial({
+            color: 0xffffff,
+            map: mapTextureGray,
+            specularMap: 0xcccccc
+        });
+
+
+        function makeBack(y, z) {
+            var seat = new THREE.Mesh(makeBackGeo, makeBackMtl);
+            seat.position.set(0, y, z);
+            return seat;
+        }
+
+
+        var makeMainBackGeo = new THREE.BoxBufferGeometry(20, 35, 5);
+        var makeMainBackMtl = new THREE.MeshPhongMaterial({
+            color: 0xffffff,
+            map: mapTextureGray,
+            specularMap: 0xcccccc
+        });
+
+        function makeMainBack(y, z) {
+            var seat = new THREE.Mesh(makeMainBackGeo, makeMainBackMtl);
+            seat.position.set(0, y, z);
+            return seat;
+        }
+
+
+        //Arms 1と2をまとめて
+
+        var makeArmsGeo = new THREE.BoxBufferGeometry(2.5, 3, 20);
+        var makeArmsMtl = new THREE.MeshPhongMaterial({
+            color: 0xffffff,
+            map: mapTextureGray,
+            specularMap: 0xcccccc
+        });
+
+
+
+        function makeArms1(x, y, z) {
+
+            var seat = new THREE.Mesh(makeArmsGeo, makeArmsMtl);
+            seat.position.set(x, y, z);
+            return seat;
+        }
+
+        function makeArms2(x, y, z) {
+            var seat = new THREE.Mesh(makeArmsGeo, makeArmsMtl);
+            seat.position.set(x, y, z);
+            return seat;
+        }
+
+
+
+
+        ///合体！！！ここで組み立て！        
+        function makeChair(x, y, z) {
+            var chairGroup = new THREE.Group();
+            chairGroup.add(makeSeat());
+            chairGroup.add(makeBack(22.5, -10));
+            chairGroup.add(makeMainBack(3, -10));
+            chairGroup.add(makeArms1(11, 5, -2.5));
+            chairGroup.add(makeArms2(-11, 5, -2.5));
+            chairGroup.add(makeSide1(5, 20, -10));
+            chairGroup.add(makeSide2(-5, 20, -10));
+            chairGroup.position.set(x, y, z);
+            return chairGroup;
+        }
+
+
+        //座席のカーブ1をここで作成
+
+
+        var makeSideParts1Geo = new THREE.CylinderBufferGeometry(5, 5, 5, 30, 30, false, 0, 1.575);
+        var makeSideParts1Mtl = new THREE.MeshPhongMaterial({
+            color: 0xffffff,
+            map: mapTextureGray,
+            specularMap: 0xcccccc
+        });
+
+        function makeSideParts1() {
+            var side = new THREE.Mesh(makeSideParts1Geo, makeSideParts1Mtl);
+            side.rotation.x = Math.PI * -0.5;
+            return side;
+        }
+
+
+        //座席のカーブ2をここで作成
+
+
+
+        var makeSideParts2Geo = new THREE.CylinderBufferGeometry(5, 5, 5, 30, 30, false, 0, 1.575);
+        var makeSideParts2Mtl = new THREE.MeshPhongMaterial({
+            color: 0xffffff,
+            map: mapTextureGray,
+            specularMap: 0xcccccc
+        });
+
+
+
+        function makeSideParts2() {
+            var side = new THREE.Mesh(makeSideParts2Geo, makeSideParts2Mtl);
+            side.rotation.x = Math.PI * -0.5;
+            side.rotation.z = Math.PI * 1;
+            return side;
+        }
+
+
+        ///合体！！！ここで組み立て！
+        function makeSide1(x, y, z) {
+            var sideGroup = new THREE.Group();
+            sideGroup.add(makeSideParts1());
+            sideGroup.position.set(x, y, z);
+            return sideGroup;
+        }
+
+
+        ///合体！！！ここで組み立て！
+        function makeSide2(x, y, z) {
+            var sideGroup = new THREE.Group();
+            sideGroup.add(makeSideParts2());
+            sideGroup.position.set(x, y, z);
+            return sideGroup;
+        }
+
+
+
+        function makeCeiling(width, height, widthSegments, heightSegments) {
+            var geometry = new THREE.PlaneBufferGeometry(width, height, widthSegments, heightSegments);
+            var material = new THREE.MeshBasicMaterial({
+                color: 'black'
+            });
+            var ceiling = new THREE.Mesh(geometry, material);
+            ceiling.rotation.x = Math.PI * 0.5;
+            return ceiling;
+        }
+
+
+        function ceilingMain(x, y, z) {
+            var ceilingGroup = new THREE.Group();
+            ceilingGroup.add(makeCeiling(1500, 1500, 1, 1));
+            ceilingGroup.position.set(x, y, z);
+
+            return ceilingGroup;
+        }
+
+        
+        
+        
+        
+        
+        //天井の照明を作る！
+        
+         
+        var loaderLight = new THREE.TextureLoader();
+        var TextureLight = loader.load('img/white-glow.png');
+        
+        
+        
+            var makeCeilingLightGeo = new THREE.PlaneBufferGeometry( 30, 30, 1, 1);
+            var makeCeilingLightMtl = new THREE.MeshPhongMaterial({
+            color: 0xffffff,
+            map: TextureLight,
+            specularMap: 0xcccccc
+        });
+        
+        
+        function makeCeilingLight(){
+            var ceilingLight = new THREE.Mesh(makeCeilingLightGeo,makeCeilingLightMtl);
+            ceilingLinght.position.set(x,y,z);
+            
+            return ceilingLight;
+            
+        }
+        
+        
+
+        
+
+        //バリアフリーシートゾーン
+
+        //シート
+
+        //バリアフリーシート用のテクスチャ
+        //座席用のテクスチャ
+        var loadergreen = new THREE.TextureLoader();
+        var mapTexturegreen = loader.load('img/green.png');
+
+
+        var makeAccessibleSeatGeo = new THREE.BoxBufferGeometry(23, 7, 25);
+        var makeAccessibleSeatMtl = new THREE.MeshPhongMaterial({
+            color: 0xffffff,
+            map: mapTexturegreen,
+            specularMap: 0xcccccc
+        });
+
+        function makeAccessibleSeat() {
+            var seat = new THREE.Mesh(makeAccessibleSeatGeo, makeAccessibleSeatMtl);
+            return seat;
+
+        }
+
+
+
+
+
+
+        //バック
+
+
+
+
+        var makemakeAccessibleBackGeo = new THREE.BoxBufferGeometry(23, 30, 7);
+        var makemakeAccessibleBackMtl = new THREE.MeshPhongMaterial({
+            color: 0xffffff,
+            map: mapTexturegreen,
+            specularMap: 0xcccccc
+        });
+
+        function makemakeAccessibleBack(y, z) {
+            var seat = new THREE.Mesh(makemakeAccessibleBackGeo, makemakeAccessibleBackMtl);
+            seat.position.set(0, y, z);
+            return seat;
+
+        }
+
+
+        //車椅子の車輪をここで作成
+
+
+
+        var makeTirePartsGeo = new THREE.CylinderBufferGeometry(10, 10, 1, 64, 1, false, 6, 6.3);
+        var makeTirePartsMtl = new THREE.MeshPhongMaterial();
+
+
+        function makeTireParts() {
+            var tire = new THREE.Mesh(makeTirePartsGeo, makeTirePartsMtl);
+            tire.rotation.z = Math.PI * -0.5;
+            return tire;
+        }
+
+        ///合体！！！ここで組み立て！
+        function makeTire(x, y, z) {
+            var tireGroup = new THREE.Group();
+            tireGroup.add(makeTireParts());
+            tireGroup.position.set(x, y, z);
+            return tireGroup;
+        }
+
+
+
+
+        ///合体！！！ここで組み立て！        
+        function makeAccessibleChair(x, y, z) {
+            var accessibleChairGroup = new THREE.Group();
+            accessibleChairGroup.add(makeAccessibleSeat());
+            accessibleChairGroup.add(makemakeAccessibleBack(5, -10));
+            accessibleChairGroup.add(makeTire(-13, -4, 0));
+            accessibleChairGroup.add(makeTire(13, -4, 0));
+            //            accessibleChairGroup.add(makeTire2(0,45,120));
+
+            accessibleChairGroup.position.set(x, y, z);
+            return accessibleChairGroup;
+
+
+        }
+
+
+        //エグゼブティブシートを作る
+
+        //バリアフリーシート用のテクスチャ
+        //座席用のテクスチャ
+        var loaderred = new THREE.TextureLoader();
+        var mapTextureRed = loader.load('img/red.png');
+
+
+        var makeExSeatGeo = new THREE.BoxBufferGeometry(23, 7, 27);
+        var makeExSeatMtl = new THREE.MeshPhongMaterial({
+            color: 0xffffff,
+            map: mapTextureRed,
+            specularMap: 0xcccccc
+        });
+
+        function makeExSeat() {
+            var seat = new THREE.Mesh(makeExSeatGeo, makeExSeatMtl);
+            return seat;
+
+        }
+
+
+
+
+        var makeExBackGeo = new THREE.BoxBufferGeometry(10, 7, 7);
+        var makeExBackMtl = new THREE.MeshPhongMaterial({
+            color: 0xffffff,
+            map: mapTextureRed,
+            specularMap: 0xcccccc
+        });
+
+        function makeExBack(y, z) {
+            var seat = new THREE.Mesh(makeExBackGeo, makeExBackMtl);
+            seat.position.set(0, y, z);
+            return seat;
+
+        }
+
+
+
+
+
+        var makeExMainBackGeo = new THREE.BoxBufferGeometry(23, 12, 7);
+        var makeExMainBackMtl = new THREE.MeshPhongMaterial({
+            color: 0xffffff,
+            map: mapTextureRed,
+            specularMap: 0xcccccc
+        });
+
+        function makeExMainBack(y, z) {
+            var seat = new THREE.Mesh(makeExMainBackGeo, makeExMainBackMtl);
+            seat.position.set(0, y, z);
+            return seat;
+
+        }
+
+
+
+
+
+        var makeExMainBack2Geo = new THREE.BoxBufferGeometry(23, 7.5, 7);
+        var makeExMainBack2Mtl = new THREE.MeshPhongMaterial({
+            color: 0xffffff,
+            map: mapTextureGray,
+            specularMap: 0xcccccc
+        });
+
+        function makeExMainBack2(y, z) {
+            var seat = new THREE.Mesh(makeExMainBack2Geo, makeExMainBack2Mtl);
+            seat.position.set(0, y, z);
+            return seat;
+
+        }
+
+
+        //高級座席のカーブ1をここで作成
+
+        function makeExSideParts1(radiusTop, radiusBottom, height, radiusSegments, heightSegments, openEnded, thetaStart, thetaLength) {
+            var geometry = new THREE.CylinderGeometry(radiusTop, radiusBottom, height, radiusSegments, heightSegments, openEnded, thetaStart, thetaLength);
+            var material = new THREE.MeshPhongMaterial({
+                color: 0xffffff,
+                map: mapTextureRed,
+                specularMap: 0xcccccc
+            });
+            var side = new THREE.Mesh(geometry, material);
+            side.rotation.x = Math.PI * -0.5;
+            return side;
+        }
+
+
+        //高級座席のカーブ2をここで作成
+
+        function makeExSideParts2(radiusTop, radiusBottom, height, radiusSegments, heightSegments, openEnded, thetaStart, thetaLength) {
+            var geometry = new THREE.CylinderGeometry(radiusTop, radiusBottom, height, radiusSegments, heightSegments, openEnded, thetaStart, thetaLength);
+            var material = new THREE.MeshPhongMaterial({
+                color: 0xffffff,
+                map: mapTextureRed,
+                specularMap: 0xcccccc
+            });
+            var side = new THREE.Mesh(geometry, material);
+            side.rotation.x = Math.PI * -0.5;
+            side.rotation.z = Math.PI * 1;
+            return side;
+        }
+
+
+
+        ///カーブの丸み１(右)    ！
+        function makeExSide1(x, y, z) {
+            var exSideGroup = new THREE.Group();
+            exSideGroup.add(makeExSideParts1(7, 7, 7, 30, 30, false, 0, 1.575));
+            exSideGroup.position.set(x, y, z);
+            return exSideGroup;
+        }
+
+
+        ///カーブの丸み２（左）！
+        function makeExSide2(x, y, z) {
+            var exSideGroup = new THREE.Group();
+            exSideGroup.add(makeExSideParts2(7, 7, 7, 30, 30, false, 0, 1.575));
+            exSideGroup.position.set(x, y, z);
+            return exSideGroup;
+        }
+
+
+
+
+
+        function makeExArms(width, height, depth, x, y, z) {
+            var geometry = new THREE.BoxGeometry(width, height, depth);
+            var material = new THREE.MeshPhongMaterial({
+                color: 0xffffff,
+                map: mapTextureRed,
+                specularMap: 0xcccccc
+            });
+            var seat = new THREE.Mesh(geometry, material);
+            seat.position.set(x, y, z);
+            return seat;
+        }
+
+
+        function makeExArmsTop(width, height, depth, x, y, z) {
+            var geometry = new THREE.BoxGeometry(width, height, depth);
+            var material = new THREE.MeshPhongMaterial({
+                color: 0xffffff,
+                map: mapTextureWood,
+                specularMap: 0xcccccc
+            });
+            var seat = new THREE.Mesh(geometry, material);
+            seat.position.set(x, y, z);
+            return seat;
+        }
+
+
+        //バリアフリーシート用のテクスチャ
+        //座席用のテクスチャ
+        var loadergreen = new THREE.TextureLoader();
+        var mapTextureWood = loader.load('img/wood.png');
+
+
+        ///合体！！！ここで組み立て！
+
+        function makeExChair(x, y, z) {
+            var exChairGroup = new THREE.Group();
+            exChairGroup.add(makeExSeat());
+            exChairGroup.add(makeExBack(26.5, -10));
+            exChairGroup.add(makeExMainBack(17, -10));
+            exChairGroup.add(makeExMainBack2(7.25, -10));
+            exChairGroup.add(makeExSide1(4.5, 23, -10));
+            exChairGroup.add(makeExSide2(-4.5, 23, -10));
+            exChairGroup.add(makeExArms(3, 23, 27, 13, 0, 0));
+            exChairGroup.add(makeExArms(3, 23, 27, -13, 0, 0));
+            exChairGroup.add(makeExArmsTop(3, 2, 27, -13, 12.5, 0));
+            exChairGroup.add(makeExArmsTop(3, 2, 27, 13, 12.5, 0));
+
+
+
+            exChairGroup.position.set(x, y, z);
+            return exChairGroup;
+
+        }
+
+
+        //スクリーンを作る
+
+        //        function makeScreenSeat(width, height, widthSegments, heightSegments) {
+        function makeScreenSeat(radiusTop, radiusBottom, height, radiusSegments, heightSegments, openEnded, thetaStart, thetaLength) {
+            //            var geometry = new THREE.PlaneGeometry( width, height, widthSegments, heightSegments );
+            var geometry = new THREE.CylinderGeometry(radiusTop, radiusBottom, height, radiusSegments, heightSegments, openEnded, thetaStart, thetaLength);
+
+            var material = new THREE.MeshBasicMaterial({
+                color: 0xffffff,
+                map: textureVideo,
+                specularMap: 0xcccccc
+            });
+
+            //            var material = new THREE.MeshBasicMaterial( { color: 0xffffff, map: textureVideo, specularMap: 0xcccccc ,side:0 } );
+
+            var screen = new THREE.Mesh(geometry, material);
+            screen.scale.x = -1;
+            //            screen.rotation.y = Math.PI*1;
+            return screen;
+
+        }
+
+
+
+
+        function makeScreen(x, y, z) {
+            var screenGroup = new THREE.Group();
+            var standardLength = 0.4;
+            var radius = 3200;
+            //            var screenWidth = radius*standardLength;
+            var screenHeight = radius / 16 * 9 * standardLength;
+            //            console.log (screenHeight);
+            var thetaStart = -standardLength / 2;
+
+            //            screenGroup.add(makeScreenSeat(900,600,64,64));   //radiusは半径！！！
+            screenGroup.add(makeScreenSeat(radius, radius, screenHeight, 64, 64, true, thetaStart, standardLength));
+            screenGroup.position.set(x, y, z);
+            return screenGroup;
+
+        }
+
+
+        //ダンケルク
+
+        var video = document.createElement('video');
+        video.src = 'video/dunkirk.mp4'
+        video.loop = true;
+        video.load();
+        video.play();
+
+
+        var textureVideo = new THREE.VideoTexture(video);
+        textureVideo.magFilter = THREE.LinearFilter;
+        textureVideo.minFilter = THREE.LinearFilter;
+
+        textureVideo.format = THREE.RGBFormat;
+
+
+
+        //足元のライトをポイントライトで
+
+        function makeLight(x, y, z) {
+
+            var light = new THREE.DirectionalLight(0xc96c1c, 10);
+
+
+            //        var lightAxis = new THREE.AxisHelper(50);
+            //        light.add(lightAxis);
+            light.position.set(x, y, z);
+
+
+            return light;
+
+
+        }
+
+
+        function makeLightHelper(light) {
+
+
+            var helper = new THREE.DirectionalLightHelper(light, 5);
+            return helper;
+
+
+        }
+
+
+        //壁を作る
+
+
+        var imaxWall = new THREE.TextureLoader();
+        var mapTextureWall = loader.load('img/wall.png');
+
+
+        var makeRoomBoxGeo = new THREE.BoxBufferGeometry(1500, 900, 1500);
+        var makeRoomBoxMtl = new THREE.MeshBasicMaterial({
+            side: 1,
+            color: 0xffffff,
+            map: mapTextureWall,
+            specularMap: 0xcccccc
+
+        });
+
+
+        function makeRoomBox(x, y, z) {
+            var room = new THREE.Mesh(makeRoomBoxGeo, makeRoomBoxMtl);
+            room.position.set(x, y, z);
+            //            wall.rotation.y = Math.PI * 0.5;
+            return room;
+
+        }
+    </script>
+
+
+
+
+
+</head>
+
+<body>
+    <div id="canvas-frame"></div>
+
+
+
+
+
+
+
+</body>
+
+</html>

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>csvを受け取る方法</title>
+</head>
+
+<body>
+
+    <canvas id="canvas2" style="position:absolute;top:0px;left:0px;"></canvas><br>
+    <canvas id="canvas" style="position:absolute;top:0px;left:0px;"></canvas><br>
+
+
+
+    <script>
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', 'csv/viewside.csv');
+        xhr.onload = e => {
+            console.log(JSON.parse('[[' + e.target.response.split('\n').join('],[') + ']]'));
+        };
+
+        xhr.send();
+
+
+
+        var xhr2 = new XMLHttpRequest();
+        xhr2.open('GET', 'csv/viewup.csv');
+        xhr2.onload = f => {
+            console.log(JSON.parse('[[' + f.target.response.split('\n').join('],[') + ']]'));
+        };
+
+        xhr2.send();
+
+
+        var xhr3 = new XMLHttpRequest();
+        xhr3.open('GET', 'csv/viewup2.csv');
+        xhr3.onload = g => {
+            console.log(JSON.parse('[[' + g.target.response.split('\n').join('],[') + ']]'));
+        };
+
+        xhr3.send();
+
+        var person = {
+            x: 5,
+            z: 2
+        };
+
+
+        //xは   xhr2[0]length/2で、zはxhr2length/2
+
+    </script>
+    <script type="text/javascript" src="http://jsdo.it/lib/jquery-1.11.0/js"></script>
+
+    <script type="text/javascript" src="http://jsdo.it/lib/three.js-r66/js"></script>
+    <script src="point.js"></script>
+</body>
+
+</html>

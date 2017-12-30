@@ -86,12 +86,12 @@
 
             //            function initThree(json) {
 
-            for (var i = 0; i < 6; i += 1) {
+            for (var i = 0; i < 8; i += 1) {
                 var seatData = json[i];
                 scene.add(makeSeatBox(seatData.x, seatData.y, seatData.z));
             }
 
-            for (var i = 0; i < 6; i += 1) {
+            for (var i = 0; i < 8; i += 1) {
                 var backData = json2[i];
                 scene.add(makeBackBox(backData.x, backData.y, backData.z));
             }
@@ -176,10 +176,10 @@
         var camera;
 
         function initCamera() {
-            camera = new THREE.PerspectiveCamera(45, canvasFrame.clientWidth / canvasFrame.clientHeight, 1, 10000);
+            camera = new THREE.PerspectiveCamera(50, canvasFrame.clientWidth / canvasFrame.clientHeight, 0.1, 10000);
 
             //カメラの位置
-            camera.position.set(1000, 400, 500);
+            camera.position.set(0, 15, -20);
 
             trackball = new THREE.TrackballControls(camera, canvasFrame);
             trackball.screen.width = canvasFrame.clientWidth;
@@ -190,7 +190,7 @@
             trackball.screen.offsetTop = canvasFrame.getBoundingClientRect().top;
 
             trackball.noZoom = false;
-            trackball.zoomSpeed = 4.0;
+            trackball.zoomSpeed = 2.0;
 
             trackball.noPan = false;
             trackball.panSpeed = 1, 0;
@@ -203,7 +203,7 @@
         var axis;
 
         function initObject() {
-            axis = new THREE.AxisHelper(1000);
+            axis = new THREE.AxisHelper(20);
             scene.add(axis);
             axis.position.set(0, 0, 0);
         }
@@ -243,7 +243,7 @@
         var loader = new THREE.TextureLoader();
         var mapTextureRed = loader.load('img/red.png');
 
-        var makeSeatBoxGeo = new THREE.BoxBufferGeometry(5.8, 0.1, 0.7);
+        var makeSeatBoxGeo = new THREE.BoxBufferGeometry(0.6, 0.1, 0.7);
         var makeSeatBoxMtl = new THREE.MeshPhongMaterial({
             color:0xffffff,
             map: mapTextureRed,
@@ -259,7 +259,7 @@
 
         //背面
 
-        var makeBackBoxGeo = new THREE.BoxBufferGeometry(5.8, 0.6, 0.1);
+        var makeBackBoxGeo = new THREE.BoxBufferGeometry(0.6, 0.6, 0.1);
         var makeBackBoxMtl = new THREE.MeshPhongMaterial({
             color:0xffffff,
             map:mapTextureRed,
